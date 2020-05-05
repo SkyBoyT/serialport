@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>实时湿温度显示</title>
+    <script type="text/javascript" src="js/echarts.js"></script>
+</head>
+<style>
+    /*Reset（重置）浏览器默认样式*/
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    html, body {
+        width: 100%;
+        height: 100%;
+    }
+    .main {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<body onload="WebSocketTest()" style="overflow:-Scroll;overflow-y:hidden;overflow-x:hidden">
+<div id="main" class="main"></div>
+</body>
+<script type="text/javascript">
+
+    // WebSocket接收数据
+    function WebSocketTest() {
+        // 温度
+        var temperature;
+        // 湿度
+        var humidity;
+        if ("WebSocket" in window) {
+            // 打开一个 web socket
+            var ws = new WebSocket("ws://localhost:8088/serialport/websocket/sensor");
+
+            ws.onopen = function () {
+                // 发送数据
+                // ws.send("发送数据");
+            };
+
+            ws.onmessage = function (msg) {
+                var result = msg.data;
+                console.log("ws接收到的数据：" + result);
+                if (result.indexOf('温度：') !== -1) {
+                    temperature = result.substring(3, result.length);
+                    console.log("温度：" + temperature);
+                }
+                if (result.indexOf('湿度：') !== -1) {
+                    humidity = result.substring(3, result.length);
+                    console.log("湿度：" + humidity);
+                }
+                option = {
+                    title: {
+                        text: '实时湿温度显示',
+                        textStyle: {
+                            color: 'white',
+                            fontSize: 46
+                        },
+                        left: 'center',
+                        right: 'auto',
+                        top: '10%'
+                    },
+                    backgroundColor: '#1b1b1b',
+                    tooltip: {
+                        formatter: '{a} <br/>{c} {b}'
+                    },
+                    series: [
+                        {
+                            name: '温度',
+                            type: 'gauge',
+                            center: ['25%', '50%'],    // 默认全局居中
+                            min: 0,
+                            max: 50,
+                            splitNumber: 10,
+                            radius: '50%',
+                            axisLine: {            // 坐标轴线
+                                lineStyle: {       // 属性lineStyle控制线条样式
+                                    color: [[0.09, 'lime'], [0.82, '#1e90ff'], [1, '#ff4500']],
+                                    width: 3,
+                                    shadowColor: '#fff', //默认透明
+                                    shadowBlur: 10
+                                }
+                            },
+                            axisLabel: {            // 坐标轴小标记
+                                fontWeight: 'bolder',
+                                color: '#fff',
+                                shadowColor: '#fff', //默认透明
+                                shadowBlur: 10
+                            },
+                            axisTick: {            // 坐标轴小标记
+                                length: 15,        // 属性length控制线长
+                                lineStyle: {       // 属性lineStyle控制线条样式
+                                    color: 'auto',
+                                    shadowColor: '#fff', //默认透明
+                                    shadowBlur: 10
+                                }
+                            },
+                            splitLine: {           // 分隔线
+                                length: 25,         // 属性length控制线长
+                                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                                    width: 3,
+                                    color: '#fff',
+                                    shadowColor: '#fff', //默认透明
+                                    shadowBlur: 10
+                                }
+                            },
+                            pointer: {           // 分隔线
+                                shadowColor: '#fff', //默认透明
+                                shadowBlur: 5
+                            },
+                            title: {
+                                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    fontWeight: 'bolder',
+                                    fontSize: 30,
+                                    fontStyle: 'italic',
+                                    color: '#fff',
+                                    shadowColor: '#fff', //默认透明
+                                    shadowBlur: 10
+                                }
+                            },
+                            detail: {
+                                backgroundColor: 'rgba(30,144,255,0.8)',
+                                borderWidth: 1,
+                                borderColor: '#fff',
+                                shadowColor: '#fff', //默认透明
+                                shadowBlur: 5,
+                                offsetCenter: [0, '50%'],       // x, y，单位px
+                                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    fontWeight: 'bolder',
+                                    color: '#fff'
+                                }
+                            },
+                            data: [{value: temperature, name: '温度/℃'}]
+                        },
+                        {
+                            name: '湿度',
+                            type: 'gauge',
+                            center: ['75%', '50%'],    // 默认全局居中
+                            min: 0,
+                            max: 100,
+                            splitNumber: 10,
+                            radius: '50%',
+                            axisLine: {            // 坐标轴线
+                                lineStyle: {       // 属性lineStyle控制线条样式
+                                    color: [[0.09, 'lime'], [0.82, '#1e90ff'], [1, '#ff4500']],
+                                    width: 3,
+                                    shadowColor: '#fff', //默认透明
+                                    shadowBlur: 10
+                                }
+                            },
+                            axisLabel: {            // 坐标轴小标记
+                                fontWeight: 'bolder',
+                                color: '#fff',
+                                shadowColor: '#fff', //默认透明
+                                shadowBlur: 10
+                            },
+                            axisTick: {            // 坐标轴小标记
+                                length: 15,        // 属性length控制线长
+                                lineStyle: {       // 属性lineStyle控制线条样式
+                                    color: 'auto',
+                                    shadowColor: '#fff', //默认透明
+                                    shadowBlur: 10
+                                }
+                            },
+                            splitLine: {           // 分隔线
+                                length: 25,         // 属性length控制线长
+                                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                                    width: 3,
+                                    color: '#fff',
+                                    shadowColor: '#fff', //默认透明
+                                    shadowBlur: 10
+                                }
+                            },
+                            pointer: {           // 分隔线
+                                shadowColor: '#fff', //默认透明
+                                shadowBlur: 5
+                            },
+                            title: {
+                                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    fontWeight: 'bolder',
+                                    fontSize: 30,
+                                    fontStyle: 'italic',
+                                    color: '#fff',
+                                    shadowColor: '#fff', //默认透明
+                                    shadowBlur: 10
+                                }
+                            },
+                            detail: {
+                                backgroundColor: 'rgba(30,144,255,0.8)',
+                                borderWidth: 1,
+                                borderColor: '#fff',
+                                shadowColor: '#fff', //默认透明
+                                shadowBlur: 5,
+                                offsetCenter: [0, '50%'],       // x, y，单位px
+                                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    fontWeight: 'bolder',
+                                    color: '#fff'
+                                }
+                            },
+                            data: [{value: humidity, name: '湿度/%RH'}]
+                        }
+                    ]
+                };
+                series.setOption(option);
+            };
+
+            ws.onclose = function () {
+                // 关闭 websocket
+            };
+        } else {
+            // 浏览器不支持 WebSocket
+            alert("您的浏览器不支持 WebSocket!");
+        }
+    }
+    var series = echarts.init(document.getElementById('main'));
+</script>
+
+</html>

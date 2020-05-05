@@ -1,0 +1,8 @@
+server:
+  port: 8088
+  servlet:
+    context-path: /serialport
+  tomcat:
+    uri-encoding: UTF-8
+    min-spare-threads: 30
+    max-threads: 1000
